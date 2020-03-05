@@ -1,6 +1,6 @@
 {
   "name": "manga-downloader",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Um programa pra facilitar o download de mangás de sites de leitura",
   "main": "index.js",
   "author": "Paulo Santana",
