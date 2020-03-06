@@ -1,34 +1,20 @@
-const readline = require('readline-sync');
-const axios = require('axios').default;
-const FormData = require('form-data');
-const qs = require('qs');
+import readline from 'readline-sync';
+import leitorNet from './engines/leitor-net';
 
 readline.setEncoding('utf8');
 
-async function searchManga() {
-  const search = readline.question('Insira nome do mangá para busca: ');
+async function main() {
+  const search = readline.question('Insira nome do manga para busca: ');
 
-  const form = new FormData();
-  form.append('search', search);
+  const foundMangas = await leitorNet.searchManga(search);
 
-  try {
-    const result = await axios({
-      method: 'post',
+  const index = readline.keyInSelect(
+    foundMangas.map(item => item.title),
+    'Qual desses você quer baixar?',
+  );
+  const selectedManga = foundMangas[index];
 
-      headers: {
-        'content-type': 'aaplication/x-www-form-urlencoded',
-        'X-Requested-With': 'XMLHttpRequest',
-        ...form.getHeaders(),
-      },
-      url: 'https://leitor.net/lib/search/series.json',
-      data: form,
-    });
-
-    console.log(result.data);
-  } catch (error) {
-    // console.error('DEU RUIM: ', error);
-    console.error('DEUM RUIM um pouco só', error.response.data);
-  }
+  const chapters = leitorNet.getChapters(selectedManga.id);
 }
 
-searchManga();
+main();
