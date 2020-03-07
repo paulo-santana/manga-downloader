@@ -1,12 +1,12 @@
 {
   "name": "manga-downloader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Um programa pra facilitar o download de mangás de sites de leitura",
   "main": "index.js",
   "author": "Paulo Santana",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index.js" 
+    "start": "node src/index.js"
   },
   "dependencies": {
     "axios": "^0.19.2",
