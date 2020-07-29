@@ -35,7 +35,10 @@ async function main() {
 
   const downloadOption = readline.keyInSelect(
     ['Baixar todos', 'Baixar uma faixa de capítulos específica'],
-    'Você quer baiar tudo agora ou quer baixar apenas uma faixa?',
+    'Você quer baixar tudo agora ou apenas uma faixa?',
+    {
+      encoding: 'utf8',
+    },
   );
 
   switch (downloadOption) {

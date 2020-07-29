@@ -68,6 +68,9 @@ const leitorNet = {
 
       const url = `${this.config.chapterPagesUrl}${release.id_release}.json`;
 
+      console.log(
+        `Baixando páginas do capítulo ${chapter.number} - ${chapter.chapter_name}`,
+      );
       const response = await axios({
         method: 'get',
         url,
@@ -82,7 +85,7 @@ const leitorNet = {
       }`;
       const mangaName = chapter.name;
       await this.downloadImages(images, chapterName, mangaName);
-      await this.timeout(1000);
+      await this.timeout(5000);
     }
   },
 
@@ -96,7 +99,9 @@ const leitorNet = {
   },
 
   async downloadImages(images, chapterName, manga) {
-    for (const [i, image] of images.entries()) {
+    const { length } = images;
+    for (let i = 0; i < length; i++) {
+      const image = images[i];
       try {
         const response = await axios({
           method: 'get',
@@ -104,7 +109,7 @@ const leitorNet = {
           responseType: 'stream',
         });
 
-        pageFullName = image.split('/');
+        const pageFullName = image.split('/');
         const page = pageFullName[pageFullName.length - 1];
         const path = Path.resolve(
           __dirname,
@@ -119,23 +124,26 @@ const leitorNet = {
         Fs.mkdirSync(path.slice(0, path.length - page.length), {
           recursive: true,
         });
-
-        const writer = Fs.createWriteStream(path);
-        console.log(`salvando página ${page} do capítulo ${chapterName}`);
-
-        response.data.pipe(writer);
-
-        const finish = new Promise((resolve, reject) => {
-          writer.on('finish', resolve);
-          writer.on('error', reject);
-        });
-
-        await this.timeout(500);
+        console.log(`salvando página ${page}...`);
+        await this.saveImage(path, response.data);
       } catch (error) {
-        console.error(error);
-        process.exit(31);
+        console.error('Aconteceu um erro ao baixar a imagem: ', error);
+        i--; // try this page again
+        // process.exit(31);
       }
     }
+  },
+
+  saveImage(path, imageData) {
+    const writer = Fs.createWriteStream(path, { autoClose: true });
+    imageData.pipe(writer);
+
+    const finish = new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+
+    return finish;
   },
 
   timeout(ms) {
